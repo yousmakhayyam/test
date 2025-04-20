@@ -1,0 +1,67 @@
+name: Deploy Static HTML App to Azure
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: 'yousma-rg'                 # Your resource group
+  AZURE_LOCATION: 'East US'                         # Region
+  AZURE_APP_SERVICE_PLAN: 'yousma-plan'             # Service plan
+  AZURE_WEBAPP_NAME: 'yousma-static-html-0425'      # Web App name
+
+jobs:
+
+  checkout:
+    name: Checkout Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+  create_resources:
+    name: Create Azure Resources
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create Resource Group
+        run: |
+          az group show --name ${{ env.AZURE_RESOURCE_GROUP }} || \
+          az group create --name ${{ env.AZURE_RESOURCE_GROUP }} --location "${{ env.AZURE_LOCATION }}"
+
+      - name: Create App Service Plan
+        run: |
+          az appservice plan show --name ${{ env.AZURE_APP_SERVICE_PLAN }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} || \
+          az appservice plan create --name ${{ env.AZURE_APP_SERVICE_PLAN }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --sku B1 --is-linux
+
+      - name: Create Web App
+        run: |
+          az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} || \
+          az webapp create --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --plan ${{ env.AZURE_APP_SERVICE_PLAN }} --runtime "NODE|18-lts"
+
+  deploy:
+    name: Deploy HTML App to Azure Web App
+    needs: create_resources
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Static HTML Files
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: .
