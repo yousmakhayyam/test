@@ -9,7 +9,7 @@ env:
   AZURE_RESOURCE_GROUP: 'yousma-rg'                 # Your resource group
   AZURE_LOCATION: 'East US'                         # Region
   AZURE_APP_SERVICE_PLAN: 'yousma-plan'             # Service plan
-  AZURE_WEBAPP_NAME: 'yousma-static-html-0426'      # Web App name
+  AZURE_WEBAPP_NAME: 'yousma-static-html-0428'      # Web App name
 
 jobs:
 
