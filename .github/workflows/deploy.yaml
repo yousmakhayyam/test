@@ -9,7 +9,7 @@ env:
   AZURE_RESOURCE_GROUP: 'yousma-rg'                 # Your resource group
   AZURE_LOCATION: 'East US'                         # Region
   AZURE_APP_SERVICE_PLAN: 'yousma-plan'             # Service plan
-  AZURE_WEBAPP_NAME: 'yousma-static-html-0425'      # Web App name
+  AZURE_WEBAPP_NAME: 'yousma-static-html-0426'      # Web App name
 
 jobs:
 
@@ -43,7 +43,7 @@ jobs:
       - name: Create Web App
         run: |
           az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} || \
-          az webapp create --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --plan ${{ env.AZURE_APP_SERVICE_PLAN }} --runtime "NODE|18-lts"
+          az webapp create --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --plan ${{ env.AZURE_APP_SERVICE_PLAN }} --runtime "PHP|8.1"
 
   deploy:
     name: Deploy HTML App to Azure Web App
